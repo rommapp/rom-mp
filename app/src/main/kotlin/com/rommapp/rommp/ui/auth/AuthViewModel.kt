@@ -24,15 +24,9 @@ sealed interface AuthPhase {
 }
 
 data class AuthUiState(
-    val serverUrl: String = DEFAULT_SERVER,
+    val serverUrl: String = "",
     val phase: AuthPhase = AuthPhase.EnterServer,
-) {
-    companion object {
-        // Dev default: the local RomM dev stack on the Mac's LAN IP so the QR is
-        // reachable from the approving phone. Editable on screen.
-        const val DEFAULT_SERVER = "http://192.168.1.215:3000"
-    }
-}
+)
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(

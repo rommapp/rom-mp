@@ -54,15 +54,29 @@ class PlaybackManager @Inject constructor(
 ) {
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
+    // The session accepts outside controllers that can hand the player arbitrary
+    // URIs, and redirects can leave the server, so the Bearer token is attached
+    // only to requests bound for the paired server's origin.
     private val dataSourceFactory = ResolvingDataSource.Factory(
         DefaultDataSource.Factory(context, DefaultHttpDataSource.Factory()),
     ) { dataSpec ->
         val scheme = dataSpec.uri.scheme
-        if (scheme == "http" || scheme == "https") {
-            val token = runBlocking { tokenStore.token.first() }.orEmpty()
-            dataSpec.withAdditionalHeaders(mapOf("Authorization" to "Bearer $token"))
-        } else {
+        if (scheme != "http" && scheme != "https") {
             dataSpec
+        } else {
+            val (baseUrl, token) = runBlocking {
+                tokenStore.baseUrl.first() to tokenStore.token.first()
+            }
+            val base = baseUrl?.let(Uri::parse)
+            val pairedOrigin = base != null &&
+                base.scheme == scheme &&
+                base.host == dataSpec.uri.host &&
+                base.port == dataSpec.uri.port
+            if (pairedOrigin && !token.isNullOrBlank()) {
+                dataSpec.withAdditionalHeaders(mapOf("Authorization" to "Bearer $token"))
+            } else {
+                dataSpec
+            }
         }
     }
 

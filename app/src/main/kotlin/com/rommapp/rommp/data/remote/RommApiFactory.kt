@@ -61,13 +61,17 @@ class RommApiFactory @Inject constructor(
             .build()
     }
 
-    private fun normalizeBaseUrl(raw: String): String {
-        val trimmed = raw.trim().removeSuffix("/")
-        val withScheme = if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-            trimmed
-        } else {
-            "https://$trimmed"
+    private fun normalizeBaseUrl(raw: String): String = normalizeOrigin(raw) + "/"
+
+    companion object {
+        /** Canonical server origin: trimmed, no trailing slash, https assumed for bare hosts. */
+        fun normalizeOrigin(raw: String): String {
+            val trimmed = raw.trim().removeSuffix("/")
+            return if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+                trimmed
+            } else {
+                "https://$trimmed"
+            }
         }
-        return "$withScheme/"
     }
 }
