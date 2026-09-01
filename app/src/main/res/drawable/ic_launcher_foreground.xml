@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Eighth note with a vinyl-record notehead; art authored in a 512 space,
+     scaled into the 66dp adaptive-icon safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.2"
+        android:scaleY="0.2"
+        android:translateX="4.4"
+        android:translateY="-1">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M144,356 a66,66 0 1,0 132,0 a66,66 0 1,0 -132,0 Z" />
+        <path
+            android:strokeColor="#6043C8"
+            android:strokeWidth="4"
+            android:strokeAlpha="0.35"
+            android:pathData="M158,356 a52,52 0 1,0 104,0 a52,52 0 1,0 -104,0" />
+        <path
+            android:strokeColor="#6043C8"
+            android:strokeWidth="4"
+            android:strokeAlpha="0.35"
+            android:pathData="M170,356 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0" />
+        <path
+            android:fillColor="#FFE1A38D"
+            android:pathData="M186,356 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M204,356 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M252,139 a11,11 0 0,1 22,0 L274,364 L252,364 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M262,128 C350,170 376,256 332,336 L310,318 C342,258 326,204 262,174 Z" />
+    </group>
+</vector>
