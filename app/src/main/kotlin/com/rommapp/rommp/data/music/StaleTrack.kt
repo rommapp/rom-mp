@@ -38,9 +38,11 @@ internal fun Throwable.mapStaleTrackError(events: StaleTrackEvents): Throwable {
     return StaleTrackException(this)
 }
 
+private const val HTTP_BAD_REQUEST = 400
+
 private fun Throwable.isStaleTrackError(): Boolean {
     val http = this as? HttpException ?: return false
-    if (http.code() != 400) return false
+    if (http.code() != HTTP_BAD_REQUEST) return false
     val body = runCatching { http.response()?.errorBody()?.string() }.getOrNull()
     return body?.contains("Tracks not found") == true
 }

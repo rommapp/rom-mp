@@ -167,11 +167,11 @@ class DownloadManager @Inject constructor(
             check(response.isSuccessful) { "HTTP ${response.code} for ${track.title}" }
             val body = response.body ?: error("Empty body for ${track.title}")
             val resolver = context.contentResolver
-            val extension = sourceExtension(track)
+            val extension = sourceExtension(track.streamUrl)
             val values = ContentValues().apply {
-                put(MediaStore.Audio.Media.DISPLAY_NAME, fileName(track, extension))
-                put(MediaStore.Audio.Media.MIME_TYPE, mimeType(extension))
-                put(MediaStore.Audio.Media.RELATIVE_PATH, relativePath(track, gameName))
+                put(MediaStore.Audio.Media.DISPLAY_NAME, downloadFileName(track.trackNumber, track.title, extension))
+                put(MediaStore.Audio.Media.MIME_TYPE, audioMimeType(extension))
+                put(MediaStore.Audio.Media.RELATIVE_PATH, downloadRelativePath(track.platformName, gameName))
                 put(MediaStore.Audio.Media.TITLE, track.title)
                 put(MediaStore.Audio.Media.ALBUM, gameName)
                 put(MediaStore.Audio.Media.IS_MUSIC, 1)
@@ -196,30 +196,41 @@ class DownloadManager @Inject constructor(
         }
     }
 
-    private fun relativePath(track: Track, gameName: String): String {
-        val platform = track.platformName.takeIf { it.isNotBlank() }?.let { "${sanitize(it)}/" }.orEmpty()
-        return "Music/RomM/$platform${sanitize(gameName)}"
-    }
-
-    private fun fileName(track: Track, extension: String): String {
-        val number = track.trackNumber?.let { "%02d - ".format(it) } ?: ""
-        return "$number${sanitize(track.title)}.$extension"
-    }
-
-    /**
-     * File extension of the source file, taken from the stream URL's file name.
-     * Allowlisted to a plain alphanumeric token because it lands in the
-     * MediaStore display name unescaped, unlike the sanitized path segments.
-     */
-    private fun sourceExtension(track: Track): String =
-        Uri.decode(track.streamUrl.substringAfterLast('/').substringBefore('?'))
-            .substringAfterLast('.', "")
-            .lowercase()
-            .takeIf { it.matches(Regex("[a-z0-9]{1,5}")) } ?: "mp3"
-
-    private fun mimeType(extension: String): String =
-        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "audio/mpeg"
-
-    private fun sanitize(name: String): String =
-        name.replace(Regex("[/\\\\:*?\"<>|]"), "_").trim().ifBlank { "track" }
 }
+
+/** MediaStore folder for a track: Music/RomM/<platform>/<game>, platform omitted when unknown. */
+internal fun downloadRelativePath(platformName: String, gameName: String): String {
+    val platform = platformName.takeIf { it.isNotBlank() }?.let { "${sanitizeName(it)}/" }.orEmpty()
+    return "Music/RomM/$platform${sanitizeName(gameName)}"
+}
+
+/** MediaStore display name, track-numbered when the server knows the position. */
+internal fun downloadFileName(trackNumber: Int?, title: String, extension: String): String {
+    val number = trackNumber?.let { "%02d - ".format(it) } ?: ""
+    return "$number${sanitizeName(title)}.$extension"
+}
+
+/**
+ * File extension of the source file, taken from the stream URL's file name.
+ * Allowlisted to a plain alphanumeric token because it lands in the MediaStore
+ * display name unescaped, unlike the sanitized path segments.
+ */
+internal fun sourceExtension(streamUrl: String): String =
+    Uri.decode(streamUrl.substringAfterLast('/').substringBefore('?'))
+        .substringAfterLast('.', "")
+        .lowercase()
+        .takeIf { it.matches(Regex("[a-z0-9]{1,5}")) } ?: "mp3"
+
+internal fun audioMimeType(extension: String): String =
+    MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "audio/mpeg"
+
+/**
+ * Folds a server-supplied name into one safe path segment: separators and the
+ * characters Android refuses become underscores, and surrounding dots and spaces
+ * go, so a name can never add a path segment or climb out of the album folder.
+ * Never yields a blank name.
+ */
+internal fun sanitizeName(name: String): String =
+    name.replace(Regex("[/\\\\:*?\"<>|]"), "_")
+        .trim { it.isWhitespace() || it == '.' }
+        .ifBlank { "track" }

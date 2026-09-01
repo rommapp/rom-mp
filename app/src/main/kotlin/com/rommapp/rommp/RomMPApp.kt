@@ -9,6 +9,8 @@ import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
+private const val COVER_CACHE_BYTES = 256L * 1024 * 1024
+
 @HiltAndroidApp
 class RomMPApp : Application(), ImageLoaderFactory {
 
@@ -26,7 +28,7 @@ class RomMPApp : Application(), ImageLoaderFactory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))
-                    .maxSizeBytes(256L * 1024 * 1024)
+                    .maxSizeBytes(COVER_CACHE_BYTES)
                     .build()
             }
             .respectCacheHeaders(false)
