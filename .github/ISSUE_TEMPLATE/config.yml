@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/rommapp/rom-mp/discussions
+    about: Ask questions and discuss ideas
+  - name: RomM Server Issues
+    url: https://github.com/rommapp/romm/issues
+    about: Report problems with the RomM server itself, including its music API

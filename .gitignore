@@ -20,5 +20,9 @@ captures/
 *.iml
 .idea/
 
+# --- Per-machine agent config (shared skills under .claude/skills are tracked) ---
+.claude/settings.local.json
+.claude/.cache/
+
 # --- OS cruft ---
 .DS_Store
