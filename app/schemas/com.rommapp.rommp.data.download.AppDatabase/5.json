@@ -1,0 +1,190 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "4e1a91628e5062a13f2769c04b84a5a0",
+    "entities": [
+      {
+        "tableName": "downloaded_games",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`romId` INTEGER NOT NULL, `name` TEXT NOT NULL, `platformName` TEXT NOT NULL, `coverPath` TEXT, `downloadedAt` INTEGER NOT NULL, PRIMARY KEY(`romId`))",
+        "fields": [
+          {
+            "fieldPath": "romId",
+            "columnName": "romId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformName",
+            "columnName": "platformName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coverPath",
+            "columnName": "coverPath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "downloadedAt",
+            "columnName": "downloadedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "romId"
+          ]
+        }
+      },
+      {
+        "tableName": "downloaded_tracks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`romFileId` INTEGER NOT NULL, `gameRomId` INTEGER NOT NULL, `title` TEXT NOT NULL, `gameName` TEXT NOT NULL, `trackNumber` INTEGER, `durationSeconds` REAL, `audioUri` TEXT NOT NULL, `md5Hash` TEXT, PRIMARY KEY(`romFileId`))",
+        "fields": [
+          {
+            "fieldPath": "romFileId",
+            "columnName": "romFileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameRomId",
+            "columnName": "gameRomId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameName",
+            "columnName": "gameName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackNumber",
+            "columnName": "trackNumber",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "durationSeconds",
+            "columnName": "durationSeconds",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "audioUri",
+            "columnName": "audioUri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "md5Hash",
+            "columnName": "md5Hash",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "romFileId"
+          ]
+        }
+      },
+      {
+        "tableName": "cached_tracks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`romFileId` INTEGER NOT NULL, `gameRomId` INTEGER NOT NULL, `title` TEXT NOT NULL, `gameName` TEXT NOT NULL, `platformName` TEXT NOT NULL, `trackNumber` INTEGER, `durationSeconds` REAL, `streamUrl` TEXT NOT NULL, `coverUrl` TEXT, `gameCoverUrl` TEXT, `md5Hash` TEXT, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`romFileId`))",
+        "fields": [
+          {
+            "fieldPath": "romFileId",
+            "columnName": "romFileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameRomId",
+            "columnName": "gameRomId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameName",
+            "columnName": "gameName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformName",
+            "columnName": "platformName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackNumber",
+            "columnName": "trackNumber",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "durationSeconds",
+            "columnName": "durationSeconds",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "streamUrl",
+            "columnName": "streamUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coverUrl",
+            "columnName": "coverUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gameCoverUrl",
+            "columnName": "gameCoverUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "md5Hash",
+            "columnName": "md5Hash",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "romFileId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4e1a91628e5062a13f2769c04b84a5a0')"
+    ]
+  }
+}

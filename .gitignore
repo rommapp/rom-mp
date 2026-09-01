@@ -1,0 +1,24 @@
+# --- Signing / local machine config (never commit) ---
+local.properties
+keystore.properties
+*.keystore
+*.jks
+
+# --- Android / Gradle build outputs ---
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# --- Kotlin / IDE ---
+.kotlin/
+*.iml
+.idea/
+
+# --- OS cruft ---
+.DS_Store

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dev-permissive: allow cleartext HTTP so the app can reach a local RomM dev
+  stack (http://<lan-ip>:3000 or localhost). Tighten before any release build.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
