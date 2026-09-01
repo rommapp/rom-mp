@@ -90,7 +90,16 @@ android {
     }
 
     sourceSets["main"].java.srcDirs("src/main/kotlin")
+    sourceSets["test"].java.srcDirs("src/test/kotlin")
     sourceSets["androidTest"].assets.srcDir("$projectDir/schemas")
+
+    testOptions {
+        unitTests {
+            // Robolectric supplies the real android.net.Uri and MimeTypeMap. Stub
+            // return values stay off so a test can never pass against a null default.
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 ksp {
@@ -145,6 +154,8 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.okhttp.mockwebserver)
 }
 
 val verifyReleaseSigningConfig = tasks.register("verifyReleaseSigningConfig") {

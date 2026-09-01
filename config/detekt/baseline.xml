@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MatchingDeclarationName:AppNav.kt$Routes</ID>
+    <ID>MatchingDeclarationName:RomDtos.kt$RomSummaryDto</ID>
+    <ID>MatchingDeclarationName:UserDtos.kt$CurrentUserDto</ID>
+  </CurrentIssues>
+</SmellBaseline>

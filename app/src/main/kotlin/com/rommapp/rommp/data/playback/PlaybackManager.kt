@@ -54,30 +54,13 @@ class PlaybackManager @Inject constructor(
 ) {
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    // The session accepts outside controllers that can hand the player arbitrary
-    // URIs, and redirects can leave the server, so the Bearer token is attached
-    // only to requests bound for the paired server's origin.
     private val dataSourceFactory = ResolvingDataSource.Factory(
         DefaultDataSource.Factory(context, DefaultHttpDataSource.Factory()),
     ) { dataSpec ->
-        val scheme = dataSpec.uri.scheme
-        if (scheme != "http" && scheme != "https") {
-            dataSpec
-        } else {
-            val (baseUrl, token) = runBlocking {
-                tokenStore.baseUrl.first() to tokenStore.token.first()
-            }
-            val base = baseUrl?.let(Uri::parse)
-            val pairedOrigin = base != null &&
-                base.scheme == scheme &&
-                base.host == dataSpec.uri.host &&
-                base.port == dataSpec.uri.port
-            if (pairedOrigin && !token.isNullOrBlank()) {
-                dataSpec.withAdditionalHeaders(mapOf("Authorization" to "Bearer $token"))
-            } else {
-                dataSpec
-            }
+        val headers = streamAuthHeaders(dataSpec.uri) {
+            runBlocking { tokenStore.baseUrl.first() to tokenStore.token.first() }
         }
+        if (headers.isEmpty()) dataSpec else dataSpec.withAdditionalHeaders(headers)
     }
 
     private var player: ExoPlayer? = null
@@ -274,6 +257,11 @@ class PlaybackManager @Inject constructor(
         )
     }
 
+    /** Position refresh cadence while playing; fast enough that the scrubber tracks smoothly. */
+    private companion object {
+        const val POSITION_POLL_MS = 500L
+    }
+
     private fun startPolling() {
         stopPolling()
         positionJob = scope.launch {
@@ -281,7 +269,7 @@ class PlaybackManager @Inject constructor(
                 if (subscribers > 0) {
                     while (true) {
                         publish()
-                        delay(500)
+                        delay(POSITION_POLL_MS)
                     }
                 }
             }
@@ -305,4 +293,28 @@ class PlaybackManager @Inject constructor(
                     .build(),
             )
             .build()
+}
+
+/**
+ * Request headers for a media URI: the Bearer header when [uri] names the paired
+ * server's origin, otherwise none.
+ *
+ * The MediaSession accepts outside controllers that can hand the player arbitrary
+ * URIs, and a redirect can leave the server, so scheme, host and port must all
+ * match the paired origin before the token travels. Local URIs (content://,
+ * file://) never carry credentials, so [credentials] is not consulted for them.
+ */
+internal fun streamAuthHeaders(
+    uri: Uri,
+    credentials: () -> Pair<String?, String?>,
+): Map<String, String> {
+    val scheme = uri.scheme
+    if (scheme != "http" && scheme != "https") return emptyMap()
+    val (baseUrl, token) = credentials()
+    if (token.isNullOrBlank()) return emptyMap()
+    val base = baseUrl?.let(Uri::parse) ?: return emptyMap()
+    val pairedOrigin = base.scheme == scheme &&
+        base.host == uri.host &&
+        base.port == uri.port
+    return if (pairedOrigin) mapOf("Authorization" to "Bearer $token") else emptyMap()
 }

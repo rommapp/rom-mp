@@ -5,7 +5,6 @@ import com.rommapp.rommp.data.download.CachedTrackEntity
 import com.rommapp.rommp.data.download.DownloadDao
 import com.rommapp.rommp.data.remote.RommApiFactory
 import com.rommapp.rommp.data.remote.RommMusicApi
-import com.rommapp.rommp.data.remote.RommRomsApi
 import com.rommapp.rommp.data.remote.dto.FacetValueDto
 import com.rommapp.rommp.data.remote.dto.MusicTrackDto
 import com.rommapp.rommp.data.remote.dto.PaginatedResponse

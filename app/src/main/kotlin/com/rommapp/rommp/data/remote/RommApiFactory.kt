@@ -61,9 +61,10 @@ class RommApiFactory @Inject constructor(
             .build()
     }
 
-    private fun normalizeBaseUrl(raw: String): String = normalizeOrigin(raw) + "/"
-
     companion object {
+        /** Retrofit base URL: the canonical origin with the trailing slash Retrofit requires. */
+        internal fun normalizeBaseUrl(raw: String): String = normalizeOrigin(raw) + "/"
+
         /** Canonical server origin: trimmed, no trailing slash, https assumed for bare hosts. */
         fun normalizeOrigin(raw: String): String {
             val trimmed = raw.trim().removeSuffix("/")

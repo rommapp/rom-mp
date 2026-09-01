@@ -152,7 +152,12 @@ class AlbumViewModel @Inject constructor(
                 runCatching { repository.gameTracks(romId) }
                     .onSuccess { tracks ->
                         _state.update {
-                            it.copy(loading = false, tracks = tracks, offline = false, coverUrl = tracks.firstOrNull()?.albumCoverUrl)
+                            it.copy(
+                                loading = false,
+                                tracks = tracks,
+                                offline = false,
+                                coverUrl = tracks.firstOrNull()?.albumCoverUrl,
+                            )
                         }
                     }
                     .onFailure { e ->
@@ -181,7 +186,12 @@ class AlbumViewModel @Inject constructor(
         val fallback = cached.ifEmpty { downloadManager.downloadedTracks(romId) }
         if (fallback.isNotEmpty()) {
             _state.update {
-                it.copy(loading = false, tracks = fallback, offline = true, coverUrl = fallback.firstOrNull()?.albumCoverUrl)
+                it.copy(
+                    loading = false,
+                    tracks = fallback,
+                    offline = true,
+                    coverUrl = fallback.firstOrNull()?.albumCoverUrl,
+                )
             }
         } else {
             _state.update { it.copy(loading = false, error = error?.message ?: "Offline - nothing downloaded") }
