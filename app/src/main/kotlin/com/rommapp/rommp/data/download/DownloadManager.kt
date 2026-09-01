@@ -206,12 +206,16 @@ class DownloadManager @Inject constructor(
         return "$number${sanitize(track.title)}.$extension"
     }
 
-    /** File extension of the source file, taken from the stream URL's file name. */
+    /**
+     * File extension of the source file, taken from the stream URL's file name.
+     * Allowlisted to a plain alphanumeric token because it lands in the
+     * MediaStore display name unescaped, unlike the sanitized path segments.
+     */
     private fun sourceExtension(track: Track): String =
         Uri.decode(track.streamUrl.substringAfterLast('/').substringBefore('?'))
             .substringAfterLast('.', "")
             .lowercase()
-            .ifBlank { "mp3" }
+            .takeIf { it.matches(Regex("[a-z0-9]{1,5}")) } ?: "mp3"
 
     private fun mimeType(extension: String): String =
         MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "audio/mpeg"

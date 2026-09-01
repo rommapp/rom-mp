@@ -42,7 +42,7 @@ class AuthRepository @Inject constructor(
                 requestedScopes = REQUESTED_SCOPES,
             ),
         )
-        val origin = baseUrl.trim().removeSuffix("/")
+        val origin = RommApiFactory.normalizeOrigin(baseUrl)
         return PairingChallenge(
             deviceCode = response.deviceCode,
             userCode = response.userCode,
@@ -65,7 +65,7 @@ class AuthRepository @Inject constructor(
         val body = response.body()
         if (response.isSuccessful && body != null) {
             tokenStore.save(
-                baseUrl = baseUrl.trim().removeSuffix("/"),
+                baseUrl = RommApiFactory.normalizeOrigin(baseUrl),
                 token = body.accessToken,
                 deviceId = body.deviceId,
                 scopes = body.scopes,

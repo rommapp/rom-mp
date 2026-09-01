@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The auth DataStore holds the rmm_ bearer token granted to this specific
+  device at pairing. Re-pairing is a quick QR scan, so cloud backup and
+  device transfer both exclude the credential instead of copying it.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/auth.preferences_pb" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/auth.preferences_pb" />
+    </device-transfer>
+</data-extraction-rules>

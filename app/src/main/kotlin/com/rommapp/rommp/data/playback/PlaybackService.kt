@@ -2,6 +2,10 @@ package com.rommapp.rommp.data.playback
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Process
+import androidx.annotation.OptIn
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,6 +19,7 @@ import javax.inject.Inject
  * and never releases it.
  */
 @AndroidEntryPoint
+@OptIn(UnstableApi::class)
 class PlaybackService : MediaSessionService() {
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -32,11 +37,42 @@ class PlaybackService : MediaSessionService() {
             )
         }
         mediaSession = MediaSession.Builder(this, playbackManager.acquirePlayer())
+            .setCallback(ConnectCallback())
             .apply { sessionActivity?.let(::setSessionActivity) }
             .build()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
+
+    /**
+     * The session is exported for the system's media surfaces, which also lets
+     * any installed app connect as a controller. Unrecognized controllers keep
+     * transport control but cannot replace the queue, so they can never route
+     * the player (and its auth header) at URIs of their choosing.
+     */
+    private inner class ConnectCallback : MediaSession.Callback {
+        override fun onConnect(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+        ): MediaSession.ConnectionResult {
+            val trusted = controller.uid == Process.myUid() ||
+                controller.uid == Process.SYSTEM_UID ||
+                session.isMediaNotificationController(controller) ||
+                session.isAutoCompanionController(controller) ||
+                session.isAutomotiveController(controller)
+            if (trusted) {
+                return MediaSession.ConnectionResult.AcceptedResultBuilder(session).build()
+            }
+            val restricted = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS
+                .buildUpon()
+                .remove(Player.COMMAND_SET_MEDIA_ITEM)
+                .remove(Player.COMMAND_CHANGE_MEDIA_ITEMS)
+                .build()
+            return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailablePlayerCommands(restricted)
+                .build()
+        }
+    }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         val player = mediaSession?.player

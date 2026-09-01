@@ -77,6 +77,7 @@ private fun ServerEntry(serverUrl: String, onChange: (String) -> Unit, onConnect
         value = serverUrl,
         onValueChange = onChange,
         label = { Text("Server address") },
+        placeholder = { Text("romm.example.com") },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )
