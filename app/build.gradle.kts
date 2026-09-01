@@ -40,6 +40,12 @@ android {
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
             }
+            // v3 carries the proof-of-rotation block, so the signing key can be
+            // rotated later without orphaning installs. v1 is unnecessary below
+            // no supported API level, since minSdk is 26.
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
 
