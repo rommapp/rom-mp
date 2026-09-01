@@ -68,6 +68,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+        error += listOf(
+            "MissingTranslation",
+            "ExtraTranslation",
+            "StringFormatMatches",
+            "StringFormatInvalid",
+            "ImpliedQuantity",
+            "Untranslatable",
+        )
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -133,4 +145,20 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+val verifyReleaseSigningConfig = tasks.register("verifyReleaseSigningConfig") {
+    doLast {
+        if (!keystorePropertiesFile.exists()) {
+            throw GradleException(
+                "keystore.properties is missing. A release build would fall back to the debug " +
+                    "signing key, and an APK signed with that key cannot install over an " +
+                    "existing release. Restore the file before building a release.",
+            )
+        }
+    }
+}
+
+tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }.configureEach {
+    dependsOn(verifyReleaseSigningConfig)
 }
