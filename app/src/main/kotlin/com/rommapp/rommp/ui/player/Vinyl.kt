@@ -23,10 +23,17 @@ import com.rommapp.rommp.ui.theme.Brass
 import com.rommapp.rommp.ui.theme.Felt
 
 /**
+ * The fraction of the disc diameter given to the album art. Wider than a real
+ * 7" label so the game's cover reads at handheld size; the groove band starts
+ * just outside it.
+ */
+private const val LABEL_FRACTION = 0.47f
+
+/**
  * A real-feeling 12" record. The disc + label rotate together; the specular sheen
  * is a separate stationary overlay so the light appears fixed while the record
- * turns (the key cue that sells "real vinyl"). Proportions follow real geometry:
- * label = 0.38 x diameter, grooves span label-edge to the run-out lip.
+ * turns (the key cue that sells "real vinyl"). Grooves span label-edge to the
+ * run-out lip.
  */
 @Composable
 fun Vinyl(coverUrl: String?, rotation: Float, modifier: Modifier) {
@@ -59,7 +66,7 @@ fun Vinyl(coverUrl: String?, rotation: Float, modifier: Modifier) {
 
                 // Fine grooves from label edge to the outer run-out.
                 val step = 2.5.dp.toPx().coerceAtLeast(1.5f)
-                var r = radius * 0.40f
+                var r = radius * (LABEL_FRACTION + 0.02f)
                 var i = 0
                 while (r < radius * 0.955f) {
                     drawCircle(
@@ -72,7 +79,7 @@ fun Vinyl(coverUrl: String?, rotation: Float, modifier: Modifier) {
                     i++
                 }
                 // A few wider track-separator gaps.
-                listOf(0.55f, 0.70f, 0.85f).forEach { f ->
+                listOf(0.62f, 0.75f, 0.88f).forEach { f ->
                     drawCircle(Color(0xFF0A0806), radius = radius * f, center = c, style = Stroke(2f))
                 }
                 // Outer run-out lip.
@@ -85,10 +92,10 @@ fun Vinyl(coverUrl: String?, rotation: Float, modifier: Modifier) {
                     model = coverUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(0.38f).clip(CircleShape),
+                    modifier = Modifier.fillMaxSize(LABEL_FRACTION).clip(CircleShape),
                 )
             } else {
-                Box(Modifier.fillMaxSize(0.38f).clip(CircleShape).background(Felt))
+                Box(Modifier.fillMaxSize(LABEL_FRACTION).clip(CircleShape).background(Felt))
             }
 
             // Spindle hole + brass pin.
