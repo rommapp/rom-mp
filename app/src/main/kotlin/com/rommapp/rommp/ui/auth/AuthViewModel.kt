@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.rommapp.rommp.data.auth.AuthRepository
 import com.rommapp.rommp.data.auth.DeviceAuthPoll
 import com.rommapp.rommp.data.auth.PairingChallenge
+import com.rommapp.rommp.data.remote.RommApiFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,13 +43,27 @@ class AuthViewModel @Inject constructor(
         _state.update { it.copy(serverUrl = value) }
     }
 
+    /**
+     * Settles a typed address into the origin the app will actually contact, so a
+     * bare host visibly gains its https:// rather than gaining it silently at
+     * request time. Safe to call repeatedly; an address that already carries a
+     * scheme is left alone.
+     */
+    fun onServerUrlSettled() {
+        _state.update {
+            val trimmed = it.serverUrl.trim()
+            if (trimmed.isEmpty()) it else it.copy(serverUrl = RommApiFactory.normalizeOrigin(trimmed))
+        }
+    }
+
     fun startPairing() {
         pollJob?.cancel()
-        val url = _state.value.serverUrl.trim()
-        if (url.isEmpty()) {
+        if (_state.value.serverUrl.isBlank()) {
             _state.update { it.copy(phase = AuthPhase.Error("Enter a server address")) }
             return
         }
+        onServerUrlSettled()
+        val url = _state.value.serverUrl
         _state.update { it.copy(phase = AuthPhase.Connecting) }
         pollJob = viewModelScope.launch {
             val challenge = runCatching { authRepository.beginPairing(url) }.getOrElse {

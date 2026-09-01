@@ -70,7 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private val PlayerBackground = Color(0xFF16130F)
-private const val DEGREES_PER_SECOND = 200f
+private const val DEGREES_PER_SECOND = 150f
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this

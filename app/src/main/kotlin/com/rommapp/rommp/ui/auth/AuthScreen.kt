@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,6 +60,7 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
             AuthPhase.EnterServer -> ServerEntry(
                 serverUrl = state.serverUrl,
                 onChange = viewModel::onServerUrlChange,
+                onSettled = viewModel::onServerUrlSettled,
                 onConnect = viewModel::startPairing,
             )
 
@@ -72,14 +74,21 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun ServerEntry(serverUrl: String, onChange: (String) -> Unit, onConnect: () -> Unit) {
+private fun ServerEntry(
+    serverUrl: String,
+    onChange: (String) -> Unit,
+    onSettled: () -> Unit,
+    onConnect: () -> Unit,
+) {
     OutlinedTextField(
         value = serverUrl,
         onValueChange = onChange,
         label = { Text("Server address") },
         placeholder = { Text("romm.example.com") },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { if (!it.isFocused) onSettled() },
     )
     Spacer(Modifier.height(16.dp))
     FocusHalo(onActivate = onConnect, modifier = Modifier.fillMaxWidth()) {
